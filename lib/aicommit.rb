@@ -28,47 +28,52 @@ module Aicommit
       style: nil
     }
 
-    OptionParser.new do |opts|
-      opts.banner = "Usage: aicommit [options] [ref]"
+    begin
+      OptionParser.new do |opts|
+        opts.banner = "Usage: aicommit [options] [ref]"
 
-      opts.on("-a", "--amend", "Amend the last commit") do
-        options[:amend] = true
-      end
-
-      opts.on("-cCONTEXT", "--context=CONTEXT", "Extra context beyond the diff") do |context|
-        options[:context] << context
-      end
-
-      opts.on("-d", "--dry", "Dry run the command") do
-        options[:dry] = true
-      end
-
-      opts.on("-mMODEL", "--model=MODEL", "The model to use") do |model|
-        options[:model] = model
-      end
-
-      opts.on("--provider=PROVIDER", "Specify the provider (ollama, openai, anthropic, etc)") do |provider|
-        provider = provider.to_sym
-        unless [:ollama, :openai, :anthropic, :google, :mistral].include?(provider)
-          puts "Invalid provider specified. Valid providers are: ollama, openai, anthropic, google, mistral"
-          exit 1
+        opts.on("-a", "--amend", "Amend the last commit") do
+          options[:amend] = true
         end
-        options[:provider] = provider
-      end
 
-      opts.on("--force-external", "Force using external AI provider even for private repos") do
-        options[:force_external] = true
-      end
+        opts.on("-cCONTEXT", "--context=CONTEXT", "Extra context beyond the diff") do |context|
+          options[:context] << context
+        end
 
-      opts.on("-sSTYLE", "--style=STYLE", "Path to the style guide file") do |style|
-        options[:style] = style
-      end
+        opts.on("-d", "--dry", "Dry run the command") do
+          options[:dry] = true
+        end
 
-      opts.on("--version", "Show version") do
-        puts "aicommit version \\#{Aicommit::VERSION}" # fixed line
-        exit
-      end
-    end.parse!
+        opts.on("-mMODEL", "--model=MODEL", "The model to use") do |model|
+          options[:model] = model
+        end
+
+        opts.on("--provider=PROVIDER", "Specify the provider (ollama, openai, anthropic, etc)") do |provider|
+          provider = provider.to_sym
+          unless [:ollama, :openai, :anthropic, :google, :mistral].include?(provider)
+            puts "Invalid provider specified. Valid providers are: ollama, openai, anthropic, google, mistral"
+            exit 1
+          end
+          options[:provider] = provider
+        end
+
+        opts.on("--force-external", "Force using external AI provider even for private repos") do
+          options[:force_external] = true
+        end
+
+        opts.on("-sSTYLE", "--style=STYLE", "Path to the style guide file") do |style|
+          options[:style] = style
+        end
+
+        opts.on("--version", "Show version") do
+          puts "aicommit version \\#{Aicommit::VERSION}" # fixed line
+          exit
+        end
+      end.parse!
+    rescue OptionParser::InvalidOption => e
+      STDERR.puts "Error: \\\"#{e.message}\\\""
+      exit 1
+    end
 
     unless test_mode
       unless options[:api_key]

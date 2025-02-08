@@ -44,33 +44,35 @@ aicommit [options] [ref]
 ### Options
 
 - `-a, --amend`: Amend the last commit.
-- `-c, --context=CONTEXT`: Extra context beyond the diff. 
-  
-  Examples:
-  1. If your commit involves refactoring a function to improve its performance, you might provide context like:
-     ```shell
-     aicommit -m MODEL -c "Refactored to improve performance by using algorithm X"
-     ```
-     This context helps the AI craft a more informative commit message.
-  
-  2. When your commit is related to a specific JIRA ticket:
-     ```shell
-     aicommit -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
-     ```
-     Including the JIRA ticket helps relate the commit to external tracking systems.
-
-  3. Including multiple context strings:
-     ```shell
-     aicommit -m MODEL -c "Refactored for performance" -c "JIRA-1234"
-     ```
-     Multiple context strings can be added by repeating the `-c` option.
-
+- `-c, --context=CONTEXT`: Extra context beyond the diff and style guide. Multiple context strings can be added by repeating the `-c` option.
 - `-d, --dry`: Dry run the command without making any changes.
 - `-m, --model=MODEL`: Specify the AI model to use.
 - `--provider=PROVIDER`: Specify the provider (ollama, openai, anthropic, etc). Note: This only needs to be used when the specified model is available from multiple providers; otherwise, the owner of the model is used by default.
 - `--force-external`: Force using external AI provider even for private repos.
 - `-s, --style=STYLE`: Path to the style guide file. If not provided, the system looks for `COMMITS.md` in the repo root or uses the default style guide.
 - `--version`: Show version.
+
+### Examples of Using Context
+
+Using context helps the AI craft a more informative commit message.  Here are some examples.
+
+```shell
+# If your commit involves refactoring a function to improve its performance, you might provide context like:
+   aicommit -m MODEL -c "Refactored to improve performance by using algorithm XYZZY"
+
+# When your commit is related to a specific JIRA ticket:
+   aicommit -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
+
+# Including multiple context strings:
+   aicommit -m MODEL -c "Refactored for performance" -c "JIRA-1234"
+
+# The context can be used to augment the style guide.  It can also use environment variables:
+   aicommit -c "Put the work ticket as the first entry on the subject line" -c "Ticket: $TICKET"
+
+# or ...
+   aicommit -c "Put '$ticket' as the first entry on the subject line"
+
+```
 
 ### Style Guide Example
 Here is an example of what a style guide might include:
