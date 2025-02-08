@@ -24,7 +24,8 @@ module Aicommit
       provider: :ollama, # Default to ollama for local execution
       api_key: ENV['OPENAI_API_KEY'],
       save_key: false,
-      force_external: false
+      force_external: false,
+      style: nil
     }
 
     OptionParser.new do |opts|
@@ -59,8 +60,12 @@ module Aicommit
         options[:force_external] = true
       end
 
+      opts.on("-sSTYLE", "--style=STYLE", "Path to the style guide file") do |style|
+        options[:style] = style
+      end
+
       opts.on("--version", "Show version") do
-        puts "aicommit version #{Aicommit::VERSION}"
+        puts "aicommit version \\#{Aicommit::VERSION}" # fixed line
         exit
       end
     end.parse!
@@ -84,7 +89,7 @@ module Aicommit
       diff_generator = GitDiff.new(dir: dir, commit_hash: ARGV.shift, amend: options[:amend])
       diff = diff_generator.generate_diff
 
-      style_guide = StyleGuide.load(dir)
+      style_guide = StyleGuide.load(dir, options[:style])
       generator = CommitMessageGenerator.new(
         api_key: options[:api_key],
         model: options[:model],
@@ -94,7 +99,7 @@ module Aicommit
 
       commit_message = generator.generate(diff, style_guide, options[:context])
       if options[:dry]
-        puts "Dry run - would generate commit message:\n#{commit_message}"
+        puts "Dry run - would generate commit message:\n\\#{commit_message}"
         return commit_message
       else
         File.write(File.join(dir, '.aicommit_msg'), commit_message)
@@ -102,10 +107,10 @@ module Aicommit
       end
       nil
     rescue GitDiff::Error => e
-      puts "Git error: #{e.message}"
+      puts "Git error: \\#{e.message}"   # fixed line
       exit 1
     rescue StandardError => e
-      puts "Error: #{e.message}"
+      puts "Error: \\#{e.message}"  # fixed line 
       exit 1
     end
   end
