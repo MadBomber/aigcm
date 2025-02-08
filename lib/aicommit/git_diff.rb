@@ -1,4 +1,4 @@
-require 'open3'
+require "open3"
 
 module Aicommit
   class GitDiff
@@ -14,18 +14,18 @@ module Aicommit
     def generate_diff
       Dir.chdir(@dir) do
         cmd = if @amend
-                "git diff --cached HEAD^ 2>/dev/null || git diff --cached"
-              elsif @commit_hash
-                "git diff #{@commit_hash}^..#{@commit_hash}"
-              else
-                "git diff --cached"
-              end
+            "git diff --cached HEAD^ 2>/dev/null || git diff --cached"
+          elsif @commit_hash
+            "git diff #{@commit_hash}^..#{@commit_hash}"
+          else
+            "git diff --cached"
+          end
 
         stdout, _, status = Open3.capture3(cmd)
-        
+
         raise Error, "Git command failed" unless status.success?
         raise Error, "No changes detected" if stdout.strip.empty?
-        
+
         stdout
       end
     end

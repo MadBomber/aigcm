@@ -44,7 +44,7 @@ aicommit [options] [ref]
 ### Options
 
 - `-a, --amend`: Amend the last commit.
-- `-c, --context=CONTEXT`: Extra context beyond the diff and style guide. Multiple context strings can be added by repeating the `-c` option.
+- `-c, --context=CONTEXT`: Extra context beyond the diff.
 - `-d, --dry`: Dry run the command without making any changes.
 - `-m, --model=MODEL`: Specify the AI model to use.
 - `--provider=PROVIDER`: Specify the provider (ollama, openai, anthropic, etc). Note: This only needs to be used when the specified model is available from multiple providers; otherwise, the owner of the model is used by default.
@@ -52,27 +52,35 @@ aicommit [options] [ref]
 - `-s, --style=STYLE`: Path to the style guide file. If not provided, the system looks for `COMMITS.md` in the repo root or uses the default style guide.
 - `--version`: Show version.
 
-### Examples of Using Context
+### Examples
 
-Using context helps the AI craft a more informative commit message.  Here are some examples.
+1. If your commit involves refactoring a function to improve its performance, you might provide context like:
+   ```shell
+   aicommit -m MODEL -c "Refactored to improve performance by using algorithm X"
+   ```
 
-```shell
-# If your commit involves refactoring a function to improve its performance, you might provide context like:
-   aicommit -m MODEL -c "Refactored to improve performance by using algorithm XYZZY"
-
-# When your commit is related to a specific JIRA ticket:
+   This context helps the AI craft a more informative commit message.
+  
+2. When your commit is related to a specific JIRA ticket:
+   ```shell
    aicommit -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
+   ```
+   
+   Including the JIRA ticket helps relate the commit to external tracking systems.
 
-# Including multiple context strings:
+3. Including multiple context strings:
+   ```shell
    aicommit -m MODEL -c "Refactored for performance" -c "JIRA-1234"
+   ```
+   
+   Multiple context strings can be added by repeating the `-c` option.
 
-# The context can be used to augment the style guide.  It can also use environment variables:
+4. Using environment variables in context:
+   ```shell
    aicommit -c "Put the work ticket as the first entry on the subject line" -c "Ticket: $TICKET"
-
-# or ...
-   aicommit -c "Put '$ticket' as the first entry on the subject line"
-
-```
+   ```
+   
+   This allows you to dynamically include environment variables in your commit message.
 
 ### Style Guide Example
 Here is an example of what a style guide might include:
@@ -83,12 +91,6 @@ Here is an example of what a style guide might include:
 - Use present tense ("add" not "added")
 - Be descriptive but concise
 ```
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests.
-
-To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 

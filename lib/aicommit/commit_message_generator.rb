@@ -1,12 +1,12 @@
-require 'net/http'
-require 'json'
-require 'open3'
-require 'ai_client'
+require "net/http"
+require "json"
+require "open3"
+require "ai_client"
 
 module Aicommit
   class CommitMessageGenerator
     class Error < StandardError; end
-    
+
     MAX_DIFF_SIZE = 4000 # Characters
 
     def initialize(api_key:, model:, max_tokens:, base_url: nil, force_external: false)
@@ -30,7 +30,7 @@ module Aicommit
 
       processed_context = process_context(context)
       prompt = build_prompt(diff, style_guide, processed_context)
-      
+
       begin
         response = @client.chat(prompt)
         response.to_s.strip
@@ -60,20 +60,20 @@ module Aicommit
     end
 
     def check_ollama_running
-      Net::HTTP.get(URI('http://localhost:11434/api/version'))
+      Net::HTTP.get(URI("http://localhost:11434/api/version"))
     rescue StandardError
       raise Error, "Ollama is not running. Please start ollama first."
     end
 
     def check_localai_running
-      Net::HTTP.get(URI('http://localhost:8080/v1/models'))
+      Net::HTTP.get(URI("http://localhost:8080/v1/models"))
     rescue StandardError
       raise Error, "LocalAI is not running. Please start localai first."
     end
 
     def process_context(context_array)
       context_array.map do |ctx|
-        if ctx.start_with?('@')
+        if ctx.start_with?("@")
           filename = ctx[1..]
           File.read(filename) rescue "Could not read #{filename}"
         else
@@ -84,9 +84,9 @@ module Aicommit
 
     def check_repository_privacy
       return if @provider == :ollama # Local provider is always safe
-      
+
       stdout, _, status = Open3.capture3("gh repo view --json isPrivate -q '.isPrivate'")
-      
+
       if status.success? && stdout.strip == "true"
         raise Error, "This is a private repository. Use a local model (ollama) or run with --force-external flag"
       end
@@ -96,8 +96,9 @@ module Aicommit
 
     def build_prompt(diff, style_guide, context)
       <<~PROMPT
-        Generate a commit message for the following git diff.
-        Follow these style guidelines:
+        Generate a commit message for the git diff that follows these instructions.
+        Do not wrap your response in a code block.
+        Follow these style guidelines when constructing your response:
         #{style_guide}
 
         #{context.join("\n") unless context.empty?}
