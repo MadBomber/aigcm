@@ -28,7 +28,7 @@ module Aicommit
     }
 
     OptionParser.new do |opts|
-      opts.banner = "Usage: aicommit-rb [options] [ref]"
+      opts.banner = "Usage: aicommit [options] [ref]"
 
       opts.on("-a", "--amend", "Amend the last commit") do
         options[:amend] = true
@@ -60,7 +60,7 @@ module Aicommit
       end
 
       opts.on("--version", "Show version") do
-        puts "aicommit-rb version #{Aicommit::VERSION}"
+        puts "aicommit version #{Aicommit::VERSION}"
         exit
       end
     end.parse!

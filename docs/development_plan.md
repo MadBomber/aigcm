@@ -72,7 +72,7 @@ aicommit is a Ruby gem designed to generate AI-powered commit messages using git
   - Utilize Minitest’s stubbing/mocking abilities for system commands and HTTP API calls.
 
 - **Integration Testing:**  
-  - Set up tests for the CLI (aicommit-rb and bin/aicommit) to simulate ARGV input and validate overall behavior.
+  - Set up tests for the CLI bin/aicommit to simulate ARGV input and validate overall behavior.
 
 - **Coverage:**  
   - Integrate code coverage tools (e.g., SimpleCov) and aim for high test coverage.
