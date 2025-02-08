@@ -72,9 +72,15 @@ module Aicommit
       end
     end
 
-    # Generate diff and commit message
     dir = Dir.pwd
+    commit_message = nil
+    diff = nil
     begin
+      if options[:amend]
+        system('git commit --amend')
+        return
+      end
+
       diff_generator = GitDiff.new(dir: dir, commit_hash: ARGV.shift, amend: options[:amend])
       diff = diff_generator.generate_diff
 
@@ -87,9 +93,13 @@ module Aicommit
       )
 
       commit_message = generator.generate(diff, style_guide, options[:context])
-      return commit_message unless options[:dry]
-      
-      puts "Dry run - would generate commit message:\n#{commit_message}"
+      if options[:dry]
+        puts "Dry run - would generate commit message:\n#{commit_message}"
+        return commit_message
+      else
+        File.write(File.join(dir, '.aicommit_msg'), commit_message)
+        system('git commit --edit -F .aicommit_msg')
+      end
       nil
     rescue GitDiff::Error => e
       puts "Git error: #{e.message}"
