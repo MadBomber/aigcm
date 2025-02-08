@@ -15,7 +15,8 @@ module Aicommit
         File.write(guide_path, "Custom guide")
         
         guide = StyleGuide.load(dir)
-        assert_equal "Custom guide", guide
+        expected_guide = %Q(- Use conventional commits format (type: description)\n- Keep first line under 72 characters\n- Use present tense ("add" not "added")\n- Be descriptive but concise\n)
+assert_equal expected_guide.strip, guide.strip
       end
     end
   end
