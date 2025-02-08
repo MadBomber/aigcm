@@ -20,7 +20,7 @@ module Aicommit
       amend: false,
       context: [],
       dry: false,
-      model: 'mistral',  # Default to Mistral as it's available locally via ollama
+      model: 'gpt-4o',  # Default to GPT-4o as the new model
       provider: :ollama, # Default to ollama for local execution
       api_key: ENV['OPENAI_API_KEY'],
       save_key: false,

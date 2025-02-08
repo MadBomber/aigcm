@@ -8,7 +8,7 @@ module Aicommit
     GUIDE
 
     def self.load(dir)
-      config_file = File.join(dir, '.aicommitrc')
+      config_file = File.join(dir, 'COMMITS.md')
       return DEFAULT_GUIDE unless File.exist?(config_file)
 
       File.read(config_file)
