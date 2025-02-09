@@ -152,9 +152,10 @@ The following table shows a small sample of the providers supported, the envar r
 
 | Provider Link | envar Name |
 | --- | --- |
-| [Anthropic]() | ANTHROPIC_API_KEY |
-| [OpenAI]() | OPENAI_API_KEY |
-| [OpenRouter]() | OPENROUTER_API_KEY |
+| [Anthropic](https://www.anthropic.com/index/api) | ANTHROPIC_API_KEY |
+| [OpenAI](https://platform.openai.com/signup) | OPENAI_API_KEY |
+| [OpenRouter](https://openrouter.ai/) | OPENROUTER_API_KEY |
+| etc ... | ?_API_KEY |
 
 Note that OpenRouter supports lots of models from many providers.
 
