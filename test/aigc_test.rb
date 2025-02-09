@@ -4,7 +4,7 @@ require "test_helper"
 require 'fileutils'
 require 'time'
 
-class TestAicommit < Minitest::Test
+class TestAigc < Minitest::Test
   def setup
     @test_message = 'feat: example commit message'
     @orig_dir = Dir.pwd
@@ -38,13 +38,13 @@ class TestAicommit < Minitest::Test
   end
 
   def test_that_it_has_a_version_number
-    refute_nil ::Aicommit::VERSION
+    refute_nil ::Aigc::VERSION
   end
 
   def test_run_with_invalid_provider
     ARGV.replace(['--provider=invalid'])
     assert_output(/Invalid provider specified/) do
-      assert_raises(SystemExit) { Aicommit.run(test_mode: true) }
+      assert_raises(SystemExit) { Aigc.run(test_mode: true) }
     end
   end
 
@@ -52,22 +52,22 @@ class TestAicommit < Minitest::Test
     ARGV.replace(['--dry'])
 
     stub_ai_client do
-      output = capture_io { Aicommit.run(test_mode: true) }[0]
+      output = capture_io { Aigc.run(test_mode: true) }[0]
       assert_match(/Dry run - would generate commit message:/, output)
-      assert_equal true, File.exist?(File.join(@temp_dir, '.aicommit_msg'))
-      assert_equal 'Simulated commit message', File.read(File.join(@temp_dir, '.aicommit_msg'))
+      assert_equal true, File.exist?(File.join(@temp_dir, '.aigc_msg'))
+      assert_equal 'Simulated commit message', File.read(File.join(@temp_dir, '.aigc_msg'))
     end
   end
 
   def test_run_with_recent_message
-    commit_msg_path = File.join(@temp_dir, '.aicommit_msg')
+    commit_msg_path = File.join(@temp_dir, '.aigc_msg')
     File.write(commit_msg_path, @test_message)
     File.utime(Time.now, Time.now, commit_msg_path)
 
     ARGV.replace([])
 
     stub_ai_client do
-      Aicommit.run(test_mode: true)
+      Aigc.run(test_mode: true)
       # Check if it reads the recent message
       assert File.exist?(commit_msg_path)
       assert_equal @test_message, File.read(commit_msg_path)
@@ -75,14 +75,14 @@ class TestAicommit < Minitest::Test
   end
 
   def test_run_with_old_message
-    commit_msg_path = File.join(@temp_dir, '.aicommit_msg')
+    commit_msg_path = File.join(@temp_dir, '.aigc_msg')
     File.write(commit_msg_path, @test_message)
     File.utime(Time.now - 3600, Time.now - 3600, commit_msg_path)
 
     ARGV.replace([])
 
     stub_ai_client do
-      Aicommit.run(test_mode: true)
+      Aigc.run(test_mode: true)
       # Check if it generates a new commit message
       assert File.exist?(commit_msg_path)
       assert_equal 'Simulated commit message', File.read(commit_msg_path)
@@ -93,8 +93,8 @@ class TestAicommit < Minitest::Test
     ARGV.replace([])
 
     stub_ai_client do
-      Aicommit.run(test_mode: true)
-      commit_msg_path = File.join(@temp_dir, '.aicommit_msg')
+      Aigc.run(test_mode: true)
+      commit_msg_path = File.join(@temp_dir, '.aigc_msg')
       assert File.exist?(commit_msg_path)
       assert_equal 'Simulated commit message', File.read(commit_msg_path)
     end

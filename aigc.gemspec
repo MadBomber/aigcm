@@ -1,26 +1,27 @@
 # frozen_string_literal: true
 
-require_relative "lib/aicommit/version"
+require_relative "lib/aigc/version"
 
 Gem::Specification.new do |spec|
-  spec.name     = "aicommit"
-  spec.version  = Aicommit::VERSION
+  spec.name     = "aigc"
+  spec.version  = Aigc::VERSION
   spec.authors  = ["Dewayne VanHoozer"]
   spec.email    = ["dvanhoozer@gmail.com"]
 
   spec.summary      = "AI-powered git commit message generator"
   spec.description  = <<~TEXT
-    `aicommit` is a Ruby gem that generates meaningful git commit messages using 
-    artificial intelligence. It supports multiple AI providers including OpenAI, 
-    Anthropic, Google, and local models via Ollama. The gem automatically detects 
-    private repositories and defaults to using local models for security. It 
-    integrates seamlessly with git workflows and supports various commit scenarios 
-    including amending commits and handling staged changes. The gem follows 
-    conventional commit message formats and allows customization of commit message 
+    `aigc` generates meaningful git commit messages using artificial
+    intelligence. It supports multiple AI providers including OpenAI,
+    Anthropic, Google, and local models via Ollama. The gem
+    automatically detects private repositories and defaults to using
+    local models for security. It integrates seamlessly with git
+    workflows and supports various commit scenarios including amending
+    commits and handling staged changes. The gem follows conventional
+    commit message formats and allows customization of commit message
     styles through configuration.
   TEXT
 
-  spec.homepage     = "https://github.com/MadBomber/aicommit"
+  spec.homepage     = "https://github.com/MadBomber/aigc"
   spec.license      = "MIT"
 
   spec.required_ruby_version = ">= 3.1.0"

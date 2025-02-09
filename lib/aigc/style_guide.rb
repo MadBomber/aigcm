@@ -1,4 +1,4 @@
-module Aicommit
+module Aigc
   class StyleGuide
     DEFAULT_GUIDE = File.read(__FILE__).split("__END__").last.strip
 

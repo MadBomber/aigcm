@@ -1,9 +1,10 @@
+
 require "net/http"
 require "json"
 require "open3"
 require "ai_client"
 
-module Aicommit
+module Aigc
   class CommitMessageGenerator
     class Error < StandardError; end
 

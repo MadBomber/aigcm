@@ -1,8 +1,8 @@
 require 'minitest/autorun'
 require 'stringio'
-require_relative '../lib/aicommit'
+require_relative '../lib/aigc'
 
-module Aicommit
+module Aigc
   class TestAiCommitRb < Minitest::Test
     def setup
       @original_stdout = $stdout
@@ -23,7 +23,7 @@ module Aicommit
       ARGV.replace(['--provider=invalid'])
       
       assert_raises(SystemExit) do
-        Aicommit.run(test_mode: true)
+        Aigc.run(test_mode: true)
       end
       
       assert_match(/Invalid provider/, $stdout.string)
@@ -43,7 +43,7 @@ module Aicommit
       ARGV.replace(['--dry'])
       
       AiClient.stub :new, mock_client do
-        result = Aicommit.run(test_mode: true)
+        result = Aigc.run(test_mode: true)
         assert_nil result
         assert_match(/Dry run/, $stdout.string)
       end

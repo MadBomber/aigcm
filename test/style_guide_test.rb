@@ -1,7 +1,7 @@
 require 'minitest/autorun'
-require_relative '../lib/aicommit/style_guide'
+require_relative '../lib/aigc/style_guide'
 
-module Aicommit
+module Aigc
   class TestStyleGuide < Minitest::Test
     def test_load_default_guide
       skip("Skipping due to potential file path issues")
@@ -13,7 +13,7 @@ module Aicommit
       skip("Skipping due to potential file path issues")
       # Create temporary guide file
       Dir.mktmpdir do |dir|
-        guide_path = File.join(dir, '.aicommitrc')
+        guide_path = File.join(dir, '.aigcrc')
         File.write(guide_path, "Custom guide")
         
         guide = StyleGuide.load(dir)

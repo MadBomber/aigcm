@@ -1,6 +1,6 @@
 require "open3"
 
-module Aicommit
+module Aigc
   class GitDiff
     class Error < StandardError; end
 
