@@ -9,16 +9,10 @@ module Aicommit
 
     MAX_DIFF_SIZE = 4000 # Characters
 
-    def initialize(api_key:,model:, provider: nil, max_tokens:, force_external: false)
+    def initialize(model:, provider:, max_tokens:, force_external:)
       @force_external = force_external
       validate_model_provider_combination(model)
       check_provider_availability
-
-      debug_me{[
-        :model,
-        :api_key,
-        :provider
-      ]}
 
       @client = AiClient.new(model, provider: provider)
     rescue StandardError => e

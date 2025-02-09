@@ -27,9 +27,7 @@ module Aicommit
       context: [],
       dry: false,
       model: 'gpt-4o-mini',
-      provider: :ollama, # Default to ollama for local execution
-      api_key: nil,
-      save_key: false,
+      provider: nil,
       force_external: false,
       style: nil
     }
@@ -109,8 +107,8 @@ module Aicommit
 
       style_guide = StyleGuide.load(dir, options[:style])
       generator = CommitMessageGenerator.new(
-        api_key: options[:api_key],
         model: options[:model],
+        provider: options[:provider],
         max_tokens: 1000,
         force_external: options[:force_external]
       )
