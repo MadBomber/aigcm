@@ -7,9 +7,9 @@
 require 'debug_me'
 include DebugMe
 
-
 require 'optparse'
 require 'ai_client'
+require 'time'
 
 require_relative 'aicommit/version'
 require_relative 'aicommit/git_diff'
@@ -18,6 +18,7 @@ require_relative 'aicommit/style_guide'
 
 module Aicommit
   COMMIT_MESSAGE_FILE = '.aicommit_msg'
+  RECENT_THRESHOLD = 60 # seconds (1 minute)
 
   class Error < StandardError; end
 
@@ -68,7 +69,7 @@ module Aicommit
         opts.on("-sSTYLE", "--style=STYLE", "Path to the style guide file") do |style|
           options[:style] = style
         end
-
+        
         opts.on("--default", "Print the default style guide and exit") do
           puts "\nDefault Style Guide:"
           puts "-------------------"
@@ -86,45 +87,52 @@ module Aicommit
       exit 1
     end
 
-    # unless test_mode
-    #   unless options[:api_key]
-    #     puts "Error: OpenAI API key is required. Set OPENAI_API_KEY environment variable or use --openai-key"
-    #     exit 1
-    #   end
-    # end
-
     dir = Dir.pwd
     commit_message = nil
     diff = nil
+    commit_file_path = File.join(dir, Aicommit::COMMIT_MESSAGE_FILE)
+
     begin
       if options[:amend]
         system('git commit --amend')
         return
       end
 
-      diff_generator = GitDiff.new(dir: dir, commit_hash: ARGV.shift, amend: options[:amend])
-      diff = diff_generator.generate_diff
+      # Check if existing commit message is recent
+      if File.exist?(commit_file_path)
+        file_mod_time = File.mtime(commit_file_path)
+        current_time = Time.now
+        if (current_time - file_mod_time).to_i < RECENT_THRESHOLD
+          commit_message = File.read(commit_file_path)
+        end
+      end
 
-      style_guide = StyleGuide.load(dir, options[:style])
-      generator = CommitMessageGenerator.new(
-        model: options[:model],
-        provider: options[:provider],
-        max_tokens: 1000,
-        force_external: options[:force_external]
-      )
+      # Generate a new commit message if not reusing an existing one
+      unless commit_message
+        diff_generator = GitDiff.new(dir: dir, commit_hash: ARGV.shift, amend: options[:amend])
+        diff = diff_generator.generate_diff
 
-      commit_message = generator.generate(diff, style_guide, options[:context])
+        style_guide = StyleGuide.load(dir, options[:style])
+        generator = CommitMessageGenerator.new(
+          model: options[:model],
+          provider: options[:provider],
+          max_tokens: 1000,
+          force_external: options[:force_external]
+        )
+
+        commit_message = generator.generate(diff, style_guide, options[:context])
+        File.write(commit_file_path, commit_message)
+      end
+
       if options[:dry]
         puts "\nDry run - would generate commit message:"
         puts "-"*72
         puts commit_message
         puts "-"*72
         puts
-        File.write(File.join(dir, Aicommit::COMMIT_MESSAGE_FILE), commit_message)
         return commit_message
       else
-        File.write(File.join(dir, Aicommit::COMMIT_MESSAGE_FILE), commit_message)
-        system("git commit --edit -F #{Aicommit::COMMIT_MESSAGE_FILE}")
+        system("git commit --edit -F #{commit_file_path}")
       end
       nil
     rescue GitDiff::Error => e
