@@ -4,18 +4,17 @@
 # TODO:   gh repo view --json isPrivate -q '.isPrivate'
 #
 
-require "debug_me"
-include DebugMe
+require 'optparse'
+require 'ai_client'
 
-require "optparse"
-require "ai_client"
-
-require_relative "aicommit/version"
-require_relative "aicommit/git_diff"
-require_relative "aicommit/commit_message_generator"
-require_relative "aicommit/style_guide"
+require_relative 'aicommit/version'
+require_relative 'aicommit/git_diff'
+require_relative 'aicommit/commit_message_generator'
+require_relative 'aicommit/style_guide'
 
 module Aicommit
+  COMMIT_MESSAGE_FILE = '.aicommit_msg'
+
   class Error < StandardError; end
 
   def self.run(test_mode: false)
@@ -23,12 +22,12 @@ module Aicommit
       amend: false,
       context: [],
       dry: false,
-      model: "gpt-4o",  # Default to GPT-4o as the new model
+      model: 'gpt-4o',  # Default to GPT-4o as the new model
       provider: :ollama, # Default to ollama for local execution
-      api_key: ENV["OPENAI_API_KEY"],
+      api_key: ENV['OPENAI_API_KEY'],
       save_key: false,
       force_external: false,
-      style: nil,
+      style: nil
     }
 
     begin
@@ -71,19 +70,17 @@ module Aicommit
         opts.on("--default", "Print the default style guide and exit") do
           puts "\nDefault Style Guide:"
           puts "-------------------"
-          puts
           puts StyleGuide::DEFAULT_GUIDE
-          puts
           exit
         end
 
         opts.on("--version", "Show version") do
-          puts "aicommit version \\#{Aicommit::VERSION}" # fixed line
+          puts Aicommit::VERSION
           exit
         end
       end.parse!
     rescue OptionParser::InvalidOption => e
-      STDERR.puts "Error: \"#{e.message}\""
+      STDERR.puts "Error: '#{e.message}'"
       exit 1
     end
 
@@ -99,7 +96,7 @@ module Aicommit
     diff = nil
     begin
       if options[:amend]
-        system("git commit --amend")
+        system('git commit --amend')
         return
       end
 
@@ -111,27 +108,28 @@ module Aicommit
         api_key: options[:api_key],
         model: options[:model],
         max_tokens: 1000,
-        force_external: options[:force_external],
+        force_external: options[:force_external]
       )
 
       commit_message = generator.generate(diff, style_guide, options[:context])
       if options[:dry]
         puts "\nDry run - would generate commit message:"
-        puts "-" * 72
+        puts "-"*72
         puts commit_message
-        puts "-" * 72
+        puts "-"*72
         puts
+        File.write(File.join(dir, Aicommit::COMMIT_MESSAGE_FILE), commit_message)
         return commit_message
       else
-        File.write(File.join(dir, ".aicommit_msg"), commit_message)
-        system("git commit --edit -F .aicommit_msg")
+        File.write(File.join(dir, Aicommit::COMMIT_MESSAGE_FILE), commit_message)
+        system("git commit --edit -F #{Aicommit::COMMIT_MESSAGE_FILE}")
       end
       nil
     rescue GitDiff::Error => e
-      puts "Git error: \#{e.message}"   # fixed line
+      puts "Git error: #{e.message}"
       exit 1
     rescue StandardError => e
-      puts "Error: \#{e.message}"  # fixed line
+      puts "Error: #{e.message}"
       exit 1
     end
   end

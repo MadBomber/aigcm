@@ -50,47 +50,70 @@ aicommit [options] [ref]
 - `--provider=PROVIDER`: Specify the provider (ollama, openai, anthropic, etc). Note: This only needs to be used when the specified model is available from multiple providers; otherwise, the owner of the model is used by default.
 - `--force-external`: Force using external AI provider even for private repos.
 - `-s, --style=STYLE`: Path to the style guide file. If not provided, the system looks for `COMMITS.md` in the repo root or uses the default style guide.
+- `--default`: Print the default style guide and exit the application.
 - `--version`: Show version.
 
 ### Examples
 
-1. If your commit involves refactoring a function to improve its performance, you might provide context like:
+If your commit involves refactoring a function to improve its performance, you might provide context like:
    ```shell
    aicommit -m MODEL -c "Refactored to improve performance by using algorithm X"
    ```
 
    This context helps the AI craft a more informative commit message.
   
-2. When your commit is related to a specific JIRA ticket:
+When your commit is related to a specific JIRA ticket:
    ```shell
    aicommit -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
    ```
-   
+
    Including the JIRA ticket helps relate the commit to external tracking systems.
 
-3. Including multiple context strings:
+Including multiple context strings:
    ```shell
    aicommit -m MODEL -c "Refactored for performance" -c "JIRA-1234"
    ```
-   
+
    Multiple context strings can be added by repeating the `-c` option.
 
-4. Using environment variables in context:
+Using environment variables in context:
    ```shell
    aicommit -c "Put the work ticket as the first entry on the subject line" -c "Ticket: $TICKET"
    ```
-   
+
    This allows you to dynamically include environment variables in your commit message.
 
 ### Style Guide Example
-Here is an example of what a style guide might include:
+
+The style guide is used as part of the generative AI prompt that instructs the large language model (LLM) how to craft its summary of the `git diff` results.  The see the default style guide use the `--default` option.
+
+You can create your own style guide named `COMMITS.md` in the root directory of your repository.  You can also use the `--style` option to point `aicommit` to your style guide if you choose to keep it in a different place.  This is handy when you want to have consistent commit messages across several different projects.
+
+This would be a simple style guide:
 
 ```
 - Use conventional commits format (type: description)
 - Keep first line under 72 characters
 - Use present tense ("add" not "added")
 - Be descriptive but concise
+- Have fun. Be creative. Add ASCII art if you feel like it.
 ```
+
+## Last Thoughts
+
+This gem saves its commit message in the file `.aicommit_msg` at the root directory of the repository.  Its there even if you do a `--dry` run.  This could be handy if you want to incorporate `aicommit` into some larger workflow.
+
+Remember that the style guide can be extended using one or more `--context` strings.  For example you could create a shell alias like this:
+
+```
+alias gc='aicommit -c "JIRA $JIRA_TICKET"'
+```
+
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests.
+
+To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
