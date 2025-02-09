@@ -44,19 +44,15 @@ Gem::Specification.new do |spec|
   end
 
   spec.bindir = "bin"
-  spec.executables = spec.files.grep(%r{\Abin/}) { |f| File.basename(f) }
+  spec.executables = ['aigcm']
   spec.require_paths = ["lib"]
 
   # Runtime dependencies
   spec.add_dependency "ai_client", "~> 0.4.0"
-  spec.add_dependency "debug_me", "~> 1.1"
 
   # Development dependencies
-  spec.add_development_dependency "amazing_print"
-  spec.add_development_dependency "debug_me"
   spec.add_development_dependency "minitest", "~> 5.16"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rubocop", "~> 1.21"
-  spec.add_development_dependency "tocer"
 end
