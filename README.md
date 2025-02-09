@@ -1,10 +1,10 @@
-# AIGC
+# aigcm
 
-The AI git commit message generator.
-
+The **AI git commit message** generator.
+ƒ
 ## Overview
 
-**aigc** is a Ruby gem designed to generate high-quality commit messages for git diffs. It leverages AI to analyze changes in your codebase and create concise, meaningful commit messages following best practices.
+**aigcm** is a Ruby gem designed to generate high-quality commit messages for git diffs. It leverages AI to analyze changes in your codebase and create concise, meaningful commit messages following best practices.
 
 ## Features
 
@@ -18,7 +18,7 @@ The AI git commit message generator.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'aigc'
+gem 'aigcm'
 ```
 
 And then execute:
@@ -30,7 +30,7 @@ bundle install
 Or install it yourself as:
 
 ```shell
-gem install aigc
+gem install aigcm
 ```
 
 ## Usage
@@ -38,7 +38,7 @@ gem install aigc
 To generate a commit message:
 
 ```shell
-aigc [options] [ref]
+aigcm [options] [ref]
 ```
 
 ### Options
@@ -57,28 +57,28 @@ aigc [options] [ref]
 
 If your commit involves refactoring a function to improve its performance, you might provide context like:
    ```shell
-   aigc -m MODEL -c "Refactored to improve performance by using algorithm X"
+   aigcm -m MODEL -c "Refactored to improve performance by using algorithm X"
    ```
 
    This context helps the AI craft a more informative commit message.
   
 When your commit is related to a specific JIRA ticket:
    ```shell
-   aigc -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
+   aigcm -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
    ```
 
    Including the JIRA ticket helps relate the commit to external tracking systems.
 
 Including multiple context strings:
    ```shell
-   aigc -m MODEL -c "Refactored for performance" -c "JIRA-1234"
+   aigcm -m MODEL -c "Refactored for performance" -c "JIRA-1234"
    ```
 
    Multiple context strings can be added by repeating the `-c` option.
 
 Using environment variables in context:
    ```shell
-   aigc -c "Put the work ticket as the first entry on the subject line" -c "Ticket: $TICKET"
+   aigcm -c "Put the work ticket as the first entry on the subject line" -c "Ticket: $TICKET"
    ```
 
    This allows you to dynamically include environment variables in your commit message.
@@ -87,7 +87,7 @@ Using environment variables in context:
 
 The style guide is used as part of the generative AI prompt that instructs the large language model (LLM) how to craft its summary of the `git diff` results.  The see the default style guide use the `--default` option.
 
-You can create your own style guide named `COMMITS.md` in the root directory of your repository.  You can also use the `--style` option to point `aigc` to your style guide if you choose to keep it in a different place.  This is handy when you want to have consistent commit messages across several different projects.
+You can create your own style guide named `COMMITS.md` in the root directory of your repository.  You can also use the `--style` option to point `aigcm` to your style guide if you choose to keep it in a different place.  This is handy when you want to have consistent commit messages across several different projects.
 
 This would be a simple style guide:
 
@@ -101,12 +101,12 @@ This would be a simple style guide:
 
 ## Last Thoughts
 
-This gem saves its commit message in the file `.aigc_msg` at the root directory of the repository.  Its there even if you do a `--dry` run.  This could be handy if you want to incorporate `aigc` into some larger workflow.
+This gem saves its commit message in the file `.aigcm_msg` at the root directory of the repository.  Its there even if you do a `--dry` run.  This could be handy if you want to incorporate `aigcm` into some larger workflow.
 
 Remember that the style guide can be extended using one or more `--context` strings.  For example you could create a shell alias like this:
 
 ```
-alias gc='aigc -c "JIRA $JIRA_TICKET"'
+alias gc='aigcm -c "JIRA $JIRA_TICKET"'
 ```
 
 ## Development
@@ -117,7 +117,7 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
-1. Fork it (<https://github.com/your_username/aigc/fork>)
+1. Fork it (<https://github.com/your_username/aigcm/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

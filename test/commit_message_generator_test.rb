@@ -1,8 +1,8 @@
 require 'minitest/autorun'
 require 'tempfile'
-require_relative '../lib/aigc/commit_message_generator'
+require_relative '../lib/aigcm/commit_message_generator'
 
-module Aigc
+module Aigcm
   class TestCommitMessageGenerator < Minitest::Test
     def setup
       # Mock AiClient to avoid actual API calls

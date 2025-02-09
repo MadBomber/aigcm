@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "lib/aigc/version"
+require_relative "lib/aigcm/version"
 
 Gem::Specification.new do |spec|
-  spec.name     = "aigc"
-  spec.version  = Aigc::VERSION
+  spec.name     = "aigcm"
+  spec.version  = Aigcm::VERSION
   spec.authors  = ["Dewayne VanHoozer"]
   spec.email    = ["dvanhoozer@gmail.com"]
 
   spec.summary      = "AI-powered git commit message generator"
   spec.description  = <<~TEXT
-    `aigc` generates meaningful git commit messages using artificial
+    `aigcm` generates meaningful git commit messages using artificial
     intelligence. It supports multiple AI providers including OpenAI,
     Anthropic, Google, and local models via Ollama. The gem
     automatically detects private repositories and defaults to using
@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
     styles through configuration.
   TEXT
 
-  spec.homepage     = "https://github.com/MadBomber/aigc"
+  spec.homepage     = "https://github.com/MadBomber/aigcm"
   spec.license      = "MIT"
 
   spec.required_ruby_version = ">= 3.1.0"

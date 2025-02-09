@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'fileutils'
 require 'tmpdir'
-require_relative '../lib/aigc/git_diff'
+require_relative '../lib/aigcm/git_diff'
 
-module Aigc
+module Aigcm
   class TestGitDiff < Minitest::Test
     def setup
       @temp_dir = Dir.mktmpdir

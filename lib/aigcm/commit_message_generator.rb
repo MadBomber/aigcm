@@ -4,7 +4,7 @@ require "json"
 require "open3"
 require "ai_client"
 
-module Aigc
+module Aigcm
   class CommitMessageGenerator
     class Error < StandardError; end
 

@@ -1,4 +1,4 @@
-# lib/aigc.rb
+# lib/aigcm.rb
 
 require 'debug_me'
 include DebugMe
@@ -7,13 +7,13 @@ require 'optparse'
 require 'ai_client'
 require 'time'
 
-require_relative 'aigc/version'
-require_relative 'aigc/git_diff'
-require_relative 'aigc/commit_message_generator'
-require_relative 'aigc/style_guide'
+require_relative 'aigcm/version'
+require_relative 'aigcm/git_diff'
+require_relative 'aigcm/commit_message_generator'
+require_relative 'aigcm/style_guide'
 
-module Aigc
-  COMMIT_MESSAGE_FILE = '.aigc_msg'
+module Aigcm
+  COMMIT_MESSAGE_FILE = '.aigcm_msg'
   RECENT_THRESHOLD = 60 # seconds (1 minute)
 
   class Error < StandardError; end
@@ -57,7 +57,7 @@ module Aigc
     }
 
     OptionParser.new do |opts|
-      opts.banner = "Usage: aigc [options] [ref]"
+      opts.banner = "Usage: aigcm [options] [ref]"
 
       opts.on("-a", "--amend", "Amend the last commit") { options[:amend] = true }
 
@@ -91,7 +91,7 @@ module Aigc
         exit
       end
 
-      opts.on("--version", "Show version") { puts Aigc::VERSION; exit }
+      opts.on("--version", "Show version") { puts Aigcm::VERSION; exit }
 
     end.parse!
 

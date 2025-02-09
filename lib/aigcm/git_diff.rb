@@ -1,6 +1,6 @@
 require "open3"
 
-module Aigc
+module Aigcm
   class GitDiff
     class Error < StandardError; end
 
