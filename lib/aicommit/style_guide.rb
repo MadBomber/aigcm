@@ -1,7 +1,5 @@
 module Aicommit
   class StyleGuide
-
-    # SMELL: DATA.read not ::DATA.read worked! for Ruby v3.4.1
     DEFAULT_GUIDE = File.read(__FILE__).split("__END__").last.strip
 
     def self.load(dir, custom_path = nil)

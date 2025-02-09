@@ -9,11 +9,18 @@ module Aicommit
 
     MAX_DIFF_SIZE = 4000 # Characters
 
-    def initialize(api_key:, model:, max_tokens:, base_url: nil, force_external: false)
+    def initialize(api_key:,model:, provider: nil, max_tokens:, force_external: false)
       @force_external = force_external
       validate_model_provider_combination(model)
       check_provider_availability
-      @client = AiClient.new(model, api_key: api_key)
+
+      debug_me{[
+        :model,
+        :api_key,
+        :provider
+      ]}
+
+      @client = AiClient.new(model, provider: provider)
     rescue StandardError => e
       raise Error, "Failed to initialize AI client: #{e.message}"
     end

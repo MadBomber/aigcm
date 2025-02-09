@@ -4,6 +4,10 @@
 # TODO:   gh repo view --json isPrivate -q '.isPrivate'
 #
 
+require 'debug_me'
+include DebugMe
+
+
 require 'optparse'
 require 'ai_client'
 
@@ -22,9 +26,9 @@ module Aicommit
       amend: false,
       context: [],
       dry: false,
-      model: 'gpt-4o',  # Default to GPT-4o as the new model
+      model: 'gpt-4o-mini',
       provider: :ollama, # Default to ollama for local execution
-      api_key: ENV['OPENAI_API_KEY'],
+      api_key: nil,
       save_key: false,
       force_external: false,
       style: nil
@@ -84,12 +88,12 @@ module Aicommit
       exit 1
     end
 
-    unless test_mode
-      unless options[:api_key]
-        puts "Error: OpenAI API key is required. Set OPENAI_API_KEY environment variable or use --openai-key"
-        exit 1
-      end
-    end
+    # unless test_mode
+    #   unless options[:api_key]
+    #     puts "Error: OpenAI API key is required. Set OPENAI_API_KEY environment variable or use --openai-key"
+    #     exit 1
+    #   end
+    # end
 
     dir = Dir.pwd
     commit_message = nil
