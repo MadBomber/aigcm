@@ -43,8 +43,8 @@ Gem::Specification.new do |spec|
     end
   end
 
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
+  spec.bindir = "bin"
+  spec.executables = spec.files.grep(%r{\Abin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   # Runtime dependencies
@@ -54,7 +54,6 @@ Gem::Specification.new do |spec|
   # Development dependencies
   spec.add_development_dependency "amazing_print"
   spec.add_development_dependency "debug_me"
-  spec.add_development_dependency "hashdiff"
   spec.add_development_dependency "minitest", "~> 5.16"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "rake", "~> 13.0"
