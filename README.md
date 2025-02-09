@@ -1,7 +1,37 @@
 # aigcm
 
 The **AI git commit message** generator.
-ƒ
+
+See the [change log](./CHANGELOG.md) for recent changes.
+
+<!-- Tocer[start]: Auto-generated, don't remove. -->
+
+## Table of Contents
+
+  - [Overview](#overview)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Options](#options)
+    - [Examples](#examples)
+  - [Advanced Usage](#advanced-usage)
+    - [Defaults](#defaults)
+         - [Model](#model)
+         - [Style Guide](#style-guide)
+    - [Private Repos](#private-repos)
+         - [Private Repo Check Limitation](#private-repo-check-limitation)
+    - [Style Guide Example](#style-guide-example)
+  - [API Key Configuration](#api-key-configuration)
+  - [Last Thoughts](#last-thoughts)
+    - [Support Custom Workflows](#support-custom-workflows)
+    - [Non-deterministic Nature of LLMs](#non-deterministic-nature-of-llms)
+  - [Development](#development)
+  - [Contributing](#contributing)
+  - [License](#license)
+
+<!-- Tocer[finish]: Auto-generated, don't remove. -->
+
+
 ## Overview
 
 **aigcm** is a Ruby gem designed to generate high-quality commit messages for git diffs. It leverages AI to analyze changes in your codebase and create concise, meaningful commit messages following best practices.
@@ -15,19 +45,7 @@ The **AI git commit message** generator.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'aigcm'
-```
-
-And then execute:
-
-```shell
-bundle install
-```
-
-Or install it yourself as:
+`aigcm` is a CLI tool deployed as a gem.
 
 ```shell
 gem install aigcm
@@ -43,6 +61,7 @@ aigcm [options] [ref]
 
 ### Options
 
+- `-h, --help`: Display options available.
 - `-a, --amend`: Amend the last commit.
 - `-c, --context=CONTEXT`: Extra context beyond the diff.
 - `-d, --dry`: Dry run the command without making any changes.
@@ -67,21 +86,45 @@ When your commit is related to a specific JIRA ticket:
    aigcm -m MODEL -c "Resolved issues as per JIRA ticket JIRA-1234"
    ```
 
-   Including the JIRA ticket helps relate the commit to external tracking systems.
+Including the JIRA ticket helps relate the commit to external tracking systems.
 
 Including multiple context strings:
    ```shell
    aigcm -m MODEL -c "Refactored for performance" -c "JIRA-1234"
    ```
 
-   Multiple context strings can be added by repeating the `-c` option.
+Multiple context strings can be added by repeating the `-c` option.
 
 Using environment variables in context:
    ```shell
    aigcm -c "Put the work ticket as the first entry on the subject line" -c "Ticket: $TICKET"
    ```
 
-   This allows you to dynamically include environment variables in your commit message.
+This allows you to dynamically include the value of environment variables in your commit message.
+
+## Advanced Usage
+
+### Defaults
+
+There are two important defaults of which you should be aware.  The model controls how much it costs for aigcm to write the commit message for you.  The style guide impacts how well the commit message is written.
+
+#### Model
+
+If you do not specify a model `aigcm` attempts to use `gpt-4o-mini` from OpenAI.  If you want to use a different model or different provider the best way to do that is to create a shell alias like `alias aigcm='\aigcm --model o3-mini'` or `aigcm='\aigcm --model deepseek-r1 --provider ollama`
+
+#### Style Guide
+
+If you do not have a style guide named `COMMITS.md` in the root directory of your repo's working directory AND you do not specify a path to a style guid file using the `--style` option THEN `aigcm` will use its own default style guide.  To print to STDOUT the default style guide use the `--default` option. 
+
+### Private Repos
+
+When you specify a model or provider which is not associated with localhost processing, this gem issue an ERROR message when it is operating in a private repository.  There are lots of security officiers and bosses who just do not want even a `git diff` to be shared outside of their control regardless of whether the provider "crosses their heart and hopes to die" that they do not use the data you send them.
+
+You can by-pass this check by using the option `--force-external` or my simply using a model/provider combination that you process locally on your computer.
+
+#### Private Repo Check Limitation
+
+This gem uses the `gh` command to determine if the repo is private.  This means 1) your repo needs to be hosted on Github; and 2) you need to have the `gh` command installed on your machine AND logged into Github.  If any one of these conditions is not true, then the gem may terminate with an exception.
 
 ### Style Guide Example
 
@@ -99,19 +142,47 @@ This would be a simple style guide:
 - Have fun. Be creative. Add ASCII art if you feel like it.
 ```
 
+## API Key Configuration
+
+Bring your own API keys to the LLM providers.  This gem uses the generic `ai_client` gem to access LLM APIs.  If you are using a model processed on your localhost, you most likely will not need an API key.  If however, you are using an external provider then you need to acquire an API key from that provider.
+
+The API key should be set in a system environment variable (envar) that has the pattern <provider>_API_KEY.
+
+The following table shows a small sample of the providers supported, the envar required to be set and a link to the place to acquire an API key for the provider.
+
+| Provider Link | envar Name |
+| --- | --- |
+| [Anthropic]() | ANTHROPIC_API_KEY |
+| [OpenAI]() | OPENAI_API_KEY |
+| [OpenRouter]() | OPENROUTER_API_KEY |
+
+Note that OpenRouter supports lots of models from many providers.
+
 ## Last Thoughts
+
+### Support Custom Workflows
 
 This gem saves its commit message in the file `.aigcm_msg` at the root directory of the repository.  Its there even if you do a `--dry` run.  This could be handy if you want to incorporate `aigcm` into some larger workflow.
 
 Remember that the style guide can be extended using one or more `--context` strings.  For example you could create a shell alias like this:
 
-```
+```shell
 alias gc='aigcm -c "JIRA $JIRA_TICKET"'
 ```
 
+### Non-deterministic Nature of LLMs
+
+Given the same input an LLM may not (most likely will not) give you the same output as it did before.  This is why we like them.  This is also why we hate them.
+
+When you do a dry run against a set of staged changes using the `--dry` option `aigcm` will print to STDOUT a commit message.  It will also save that same commit message in the file `.aigcm_msg` in the root of your working directory.  The commit will not be made because its a "dry run."
+
+If you wait longer than 1 minute to run `aigcm` without the `--dry` option it will generate a new commit message which likely will be different than the one you read during the dry run.  However, if you run again without the dry run option in less than a minute `aigcm` will use its previous commit message on the assumption that you liked it.
+
+Don't forget that if you make a commit and then decide that you need to change the commit message there is always the `--amend` option available.
+
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests.
+After checking out the repo, run `rake test` to run the tests.  Make sure that all of the tests are passing.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
