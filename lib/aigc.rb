@@ -134,9 +134,9 @@ module Aigc
 
     if options[:dry]
       puts "\nDry run - would generate commit message:"
-      puts "-"*72
+      puts "-"*StyleGuide::LINE_MAX
       puts commit_message
-      puts "-"*72
+      puts "-"*StyleGuide::LINE_MAX
       puts
     else
       File.write(commit_file_path, commit_message)

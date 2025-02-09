@@ -1,6 +1,14 @@
+require 'erb'
+
 module Aigc
   class StyleGuide
-    DEFAULT_GUIDE = File.read(__FILE__).split("__END__").last.strip
+    LINE_MAX      = 72
+    DEFAULT_GUIDE = ERB.new(
+                      File.read(__FILE__)
+                      .split("__END__")
+                      .last
+                      .strip
+                    ).result
 
     def self.load(dir, custom_path = nil)
       # If a custom path is provided, use it
@@ -28,7 +36,7 @@ end
 __END__
 
 1. Craft a Clear Subject Line:
-• Summarize Concisely: Begin with a brief summary (72 characters max).
+• Summarize Concisely: Begin with a brief summary (<%= Aigc::StyleGuide::LINE_MAX %> characters max).
 • Capitalize the Subject: Start the subject line with a capital letter.
 • Omit Periods in Subject Line: Avoid ending with a period to save space.
 • Use Imperative Mood: Phrase commands as direct actions (e.g., "Add feature" instead of "Added feature").
@@ -36,7 +44,7 @@ __END__
 2. Provide a Detailed Body:
 • Seperate the body from the subject line with a blank line.
 • Explain the Reason: Clearly articulate the rationale for the change rather than just summarizing the modification.
-• Wrap Body Text at 72 Characters: Ensure that the body text wraps at 72 characters per line.
+• Wrap Body Text at <%= Aigc::StyleGuide::LINE_MAX %> Characters: Ensure that the body text wraps at <%= Aigc::StyleGuide::LINE_MAX %> characters per line.
 
 3. Reference Issues/Tickets:
 • Include relevant issue numbers, ticket IDs and/or references when they are provided.  Dp not invent your own reference.  Use what has been provided.
