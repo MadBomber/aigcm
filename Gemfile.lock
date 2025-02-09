@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    aicommit (0.1.0)
+    aigcm (0.2.0)
       ai_client (~> 0.4.0)
       debug_me (~> 1.1)
 
@@ -247,7 +247,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aicommit!
+  aigcm!
   amazing_print
   debug_me
   hashdiff
