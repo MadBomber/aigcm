@@ -152,7 +152,7 @@ The following table shows a small sample of the providers supported, the envar r
 
 | Provider Link | envar Name |
 | --- | --- |
-| [Anthropic](https://www.anthropic.com/index/api) | ANTHROPIC_API_KEY |
+| [Anthropic](https://www.anthropic.com/) | ANTHROPIC_API_KEY |
 | [OpenAI](https://platform.openai.com/signup) | OPENAI_API_KEY |
 | [OpenRouter](https://openrouter.ai/) | OPENROUTER_API_KEY |
 | etc ... | ?_API_KEY |
