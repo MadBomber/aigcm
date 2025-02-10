@@ -10,15 +10,12 @@ Gem::Specification.new do |spec|
 
   spec.summary      = "AI-powered git commit message generator"
   spec.description  = <<~TEXT
-    `aigcm` generates meaningful git commit messages using artificial
-    intelligence. It supports multiple AI providers including OpenAI,
-    Anthropic, Google, and local models via Ollama. The gem
-    automatically detects private repositories and defaults to using
-    local models for security. It integrates seamlessly with git
-    workflows and supports various commit scenarios including amending
-    commits and handling staged changes. The gem follows conventional
-    commit message formats and allows customization of commit message
-    styles through configuration.
+    An advanced AI-powered git commit message generator. It leverages
+    multiple AI providers including OpenAI, Anthropic, Google, and
+    local models via Ollama to create meaningful and contextual commit
+    messages. This gem streamlines the commit process, ensuring
+    consistent and informative version control practices across
+    projects.
   TEXT
 
   spec.homepage     = "https://github.com/MadBomber/aigcm"

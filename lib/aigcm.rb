@@ -27,7 +27,7 @@ module Aigcm
       return
     end
 
-    commit_message = check_recent_commit(dir)
+    commit_message = check_recent_commit(dir, options[:dry])
 
     # Generate a new commit message if not reusing an existing one
     commit_message ||= generate_commit_message(dir, options)
@@ -98,14 +98,15 @@ module Aigcm
     options
   end
 
-  private_class_method def self.check_recent_commit(dir)
+  private_class_method def self.check_recent_commit(dir, dry)
     commit_file_path = File.join(dir, COMMIT_MESSAGE_FILE)
 
     if File.exist?(commit_file_path)
       file_mod_time = File.mtime(commit_file_path)
       current_time = Time.now
       if (current_time - file_mod_time).to_i < RECENT_THRESHOLD
-        return File.read(commit_file_path)
+        return nil if dry # Skip time check in dry run mode
+    return File.read(commit_file_path)
       end
     end
 
