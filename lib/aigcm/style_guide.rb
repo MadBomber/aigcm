@@ -47,4 +47,4 @@ __END__
 • Wrap Body Text at <%= Aigcm::StyleGuide::LINE_MAX %> Characters: Ensure that the body text wraps at <%= Aigcm::StyleGuide::LINE_MAX %> characters per line.
 
 3. Reference Issues/Tickets:
-• Include relevant issue numbers, ticket IDs and/or references when they are provided.  Dp not invent your own reference.  Use what has been provided.
+• Include relevant issue numbers, ticket IDs and/or references when they are provided.  Do not invent your own reference.  Use what has been provided.
