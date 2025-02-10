@@ -1,4 +1,3 @@
-
 require "net/http"
 require "json"
 require "open3"
@@ -10,7 +9,7 @@ module Aigcm
 
     MAX_DIFF_SIZE = 4000 # Characters
 
-    def initialize(model:, provider:, max_tokens:, force_external:)
+    def initialize(max_tokens:)
       @force_external = force_external
       validate_model_provider_combination(model)
       check_provider_availability
@@ -20,7 +19,8 @@ module Aigcm
       raise Error, "Failed to initialize AI client: #{e.message}"
     end
 
-    def generate(diff, style_guide, context = [])
+    def generate(style_guide, context = [])
+      diff = GitDiff.new(dir: Dir.pwd, amend: Aigcm.amend?).generate_diff
       return "No changes to commit" if diff.strip.empty?
 
       check_repository_privacy unless @force_external
@@ -43,8 +43,8 @@ module Aigcm
 
     private
 
-    def validate_model_provider_combination(model)
-      client = AiClient.new(model)
+    def validate_model_provider_combination
+      client = AiClient.new(Aigcm.model)
       @provider = client.provider
     rescue ArgumentError => e
       raise Error, "Invalid model/provider combination: #{e.message}"

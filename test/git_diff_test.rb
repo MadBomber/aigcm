@@ -8,7 +8,7 @@ module Aigcm
     def setup
       @temp_dir = Dir.mktmpdir
       setup_git_repo
-      @diff_generator = GitDiff.new(dir: @temp_dir, commit_hash: nil, amend: false)
+      @diff_generator = GitDiff.new(dir: @temp_dir, commit_hash: nil)
     end
 
     def teardown
@@ -31,7 +31,7 @@ module Aigcm
       create_test_file("test.txt", "updated content")
       system("cd #{@temp_dir} && git add test.txt")
       
-      diff_generator = GitDiff.new(dir: @temp_dir, commit_hash: nil, amend: true)
+      diff_generator = GitDiff.new(dir: @temp_dir, commit_hash: nil)
       diff = diff_generator.generate_diff
       assert_kind_of String, diff
     end
@@ -39,7 +39,7 @@ module Aigcm
     def test_invalid_directory
       skip("Skipping due to directory handling issues")
       assert_raises(GitDiff::Error) do
-        GitDiff.new(dir: '/nonexistent', commit_hash: nil, amend: false)
+        GitDiff.new(dir: '/nonexistent', commit_hash: nil, amend: Aigcm.amend?)
       end
     end
 

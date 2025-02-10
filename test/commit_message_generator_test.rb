@@ -27,13 +27,13 @@ module Aigcm
 
     def test_generate_empty_diff
       skip("Skipping this test due to mock object issues")
-      result = @generator.generate('', 'test style guide')
+      result = @generator.generate('test style guide')
       assert_equal "No changes to commit", result
     end
 
     def test_generate_with_diff
       AiClient.stub :new, @mock_client do
-        result = @generator.generate('test diff', 'test style guide')
+        result = @generator.generate('test style guide')
         assert_kind_of String, result
         assert_match(/^feat: /, result)
       end
@@ -45,7 +45,7 @@ module Aigcm
         f.flush
 
         AiClient.stub :new, @mock_client do
-          result = @generator.generate('test diff', 'test style guide', ["@#{f.path}"])
+          result = @generator.generate('test style guide')
           assert_includes result, 'feat:'
         end
       end

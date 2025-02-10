@@ -18,21 +18,24 @@ module Aigcm
   class Error < StandardError; end
 
   class << self
-    def run(test_mode: false)
-      dir = Dir.pwd
-      options = Options.parse
+    attr_reader :parsed_options
 
-      if options[:amend]
+    def run(test_mode: false)
+      @parsed_options = Options.parse
+
+      dir = Dir.pwd
+
+      if amend?
         system('git commit --amend')
         return
       end
 
-      commit_message = check_recent_commit(dir, options[:dry])
+      commit_message = check_recent_commit(dir, dry?)
 
       # Generate a new commit message if not reusing an existing one
-      commit_message ||= generate_commit_message(dir, options)
+      commit_message ||= generate_commit_message(dir)
 
-      perform_commit(dir, commit_message, options)
+      perform_commit(dir, commit_message)
 
     rescue OptionParser::InvalidOption => e
       STDERR.puts "Error: '#{e.message}'"
@@ -45,9 +48,25 @@ module Aigcm
       exit 1
     end
 
+    def dry?
+      parsed_options[:dry]
+    end
+
+    def amend?
+      parsed_options[:amend]
+    end
+
+    def model
+      parsed_options[:model]
+    end
+
+    def provider
+      parsed_options[:provider]
+    end
+
     private
 
-    def check_recent_commit(dir, dry)
+    def check_recent_commit(dir)
       commit_file_path = File.join(dir, COMMIT_MESSAGE_FILE)
 
       if File.exist?(commit_file_path)
@@ -62,27 +81,28 @@ module Aigcm
       nil
     end
 
-    def generate_commit_message(dir, options)
-      diff_generator = GitDiff.new(dir: dir, commit_hash: ARGV.shift, amend: options[:amend])
+    def generate_commit_message(dir)
+      commit_hash = ARGV.shift # This may be nil
+      diff_generator = GitDiff.new(dir: dir, commit_hash: commit_hash, amend: amend?)
       diff = diff_generator.generate_diff
 
-      style_guide = StyleGuide.load(dir, options[:style])
+      style_guide = StyleGuide.load(dir, parsed_options[:style])
       generator = CommitMessageGenerator.new(
-        model: options[:model],
-        provider: options[:provider],
+        model: model,
+        provider: provider,
         max_tokens: 1000,
-        force_external: options[:force_external]
+        force_external: parsed_options[:force_external]
       )
 
-      commit_message = generator.generate(diff, style_guide, options[:context])
+      commit_message = generator.generate(style_guide, parsed_options[:context])
       File.write(File.join(dir, COMMIT_MESSAGE_FILE), commit_message)
       commit_message
     end
 
-    def perform_commit(dir, commit_message, options)
+    def perform_commit(dir, commit_message)
       commit_file_path = File.join(dir, COMMIT_MESSAGE_FILE)
 
-      if options[:dry]
+      if dry?
         puts "\nDry run - would generate commit message:"
         puts "-"*StyleGuide::LINE_MAX
         puts commit_message
