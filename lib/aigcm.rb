@@ -2,7 +2,7 @@ require 'debug_me'
 include DebugMe
 
 require 'optparse'
-require 'ai_client'
+require 'ruby_llm'
 require 'time'
 
 require_relative 'aigcm/version'

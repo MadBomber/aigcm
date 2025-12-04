@@ -13,7 +13,7 @@ class TestAigcm < Minitest::Test
     system('git init')
     File.write('test.txt', 'This is a test file to ensure changes are detected.')
     system('git add test.txt')
-    stub_ai_client
+    stub_ruby_llm
   end
 
   def teardown
@@ -21,19 +21,26 @@ class TestAigcm < Minitest::Test
     FileUtils.remove_entry @temp_dir if @temp_dir && Dir.exist?(@temp_dir)
   end
 
-  def stub_ai_client
-    mock_client = Object.new
-
-    def mock_client.chat(_)
+  def stub_ruby_llm
+    mock_response = Object.new
+    def mock_response.content
       'Simulated commit message'
     end
 
-    def mock_client.provider
-      :ollama
+    mock_chat = Object.new
+    mock_chat.instance_variable_set(:@mock_response, mock_response)
+    def mock_chat.ask(_prompt)
+      @mock_response
     end
 
-    AiClient.stub :new, mock_client do
-      yield if block_given?
+    mock_config = Object.new
+    def mock_config.method_missing(*); end
+    def mock_config.respond_to_missing?(*); true; end
+
+    RubyLLM.stub :chat, mock_chat do
+      RubyLLM.stub :configure, ->(&block) { block.call(mock_config) if block } do
+        yield if block_given?
+      end
     end
   end
 
@@ -51,7 +58,7 @@ class TestAigcm < Minitest::Test
   def test_run_dry_mode
     ARGV.replace(['--dry'])
 
-    stub_ai_client do
+    stub_ruby_llm do
       output = capture_io { Aigcm.run(test_mode: true) }[0]
       assert_match(/Dry run - would generate commit message:/, output)
       assert_equal true, File.exist?(File.join(@temp_dir, '.aigcm_msg'))
@@ -66,7 +73,7 @@ class TestAigcm < Minitest::Test
 
     ARGV.replace([])
 
-    stub_ai_client do
+    stub_ruby_llm do
       Aigcm.run(test_mode: true)
       # Check if it reads the recent message
       assert File.exist?(commit_msg_path)
@@ -81,7 +88,7 @@ class TestAigcm < Minitest::Test
 
     ARGV.replace([])
 
-    stub_ai_client do
+    stub_ruby_llm do
       Aigcm.run(test_mode: true)
       # Check if it generates a new commit message
       assert File.exist?(commit_msg_path)
@@ -92,7 +99,7 @@ class TestAigcm < Minitest::Test
   def test_run_with_commit_message_written
     ARGV.replace([])
 
-    stub_ai_client do
+    stub_ruby_llm do
       Aigcm.run(test_mode: true)
       commit_msg_path = File.join(@temp_dir, '.aigcm_msg')
       assert File.exist?(commit_msg_path)
