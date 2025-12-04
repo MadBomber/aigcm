@@ -4,7 +4,7 @@ module Aigcm
   class GitDiff
     class Error < StandardError; end
 
-    def initialize(dir:, commit_hash: nil)
+    def initialize(dir:, commit_hash: nil, amend: false)
       @dir = dir
       @commit_hash = commit_hash
       @amend = amend

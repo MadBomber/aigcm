@@ -15,6 +15,12 @@ module Aigcm
         :ollama
       end
 
+      # Mock GitDiff to avoid needing a real git repo
+      @mock_git_diff = Object.new
+      def @mock_git_diff.generate_diff
+        "diff --git a/test.txt b/test.txt\n+test content"
+      end
+
       AiClient.stub :new, @mock_client do
         @generator = CommitMessageGenerator.new(
           model: 'llama3.3',
@@ -33,9 +39,11 @@ module Aigcm
 
     def test_generate_with_diff
       AiClient.stub :new, @mock_client do
-        result = @generator.generate('test style guide')
-        assert_kind_of String, result
-        assert_match(/^feat: /, result)
+        GitDiff.stub :new, @mock_git_diff do
+          result = @generator.generate('test style guide')
+          assert_kind_of String, result
+          assert_match(/^feat: /, result)
+        end
       end
     end
 
@@ -45,8 +53,10 @@ module Aigcm
         f.flush
 
         AiClient.stub :new, @mock_client do
-          result = @generator.generate('test style guide')
-          assert_includes result, 'feat:'
+          GitDiff.stub :new, @mock_git_diff do
+            result = @generator.generate('test style guide')
+            assert_includes result, 'feat:'
+          end
         end
       end
     end

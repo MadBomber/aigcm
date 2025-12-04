@@ -9,18 +9,22 @@ module Aigcm
 
     MAX_DIFF_SIZE = 4000 # Characters
 
-    def initialize(max_tokens:)
+    def initialize(model:, provider:, max_tokens:, force_external: false, amend: false)
+      @model = model
+      @provider = provider
+      @max_tokens = max_tokens
       @force_external = force_external
-      validate_model_provider_combination(model)
+      @amend = amend
+      validate_model_provider_combination
       check_provider_availability
 
-      @client = AiClient.new(model, provider: provider)
+      @client = AiClient.new(@model, provider: @provider)
     rescue StandardError => e
       raise Error, "Failed to initialize AI client: #{e.message}"
     end
 
     def generate(style_guide, context = [])
-      diff = GitDiff.new(dir: Dir.pwd, amend: Aigcm.amend?).generate_diff
+      diff = GitDiff.new(dir: Dir.pwd, amend: @amend).generate_diff
       return "No changes to commit" if diff.strip.empty?
 
       check_repository_privacy unless @force_external
@@ -44,8 +48,8 @@ module Aigcm
     private
 
     def validate_model_provider_combination
-      client = AiClient.new(Aigcm.model)
-      @provider = client.provider
+      client = AiClient.new(@model)
+      @provider ||= client.provider
     rescue ArgumentError => e
       raise Error, "Invalid model/provider combination: #{e.message}"
     end

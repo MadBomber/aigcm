@@ -66,14 +66,14 @@ module Aigcm
 
     private
 
-    def check_recent_commit(dir)
+    def check_recent_commit(dir, dry_run)
       commit_file_path = File.join(dir, COMMIT_MESSAGE_FILE)
 
       if File.exist?(commit_file_path)
         file_mod_time = File.mtime(commit_file_path)
         current_time = Time.now
         if (current_time - file_mod_time).to_i < RECENT_THRESHOLD
-          return nil if dry # Skip time check in dry run mode
+          return nil if dry_run # Skip time check in dry run mode
           return File.read(commit_file_path)
         end
       end
@@ -91,7 +91,8 @@ module Aigcm
         model: model,
         provider: provider,
         max_tokens: 1000,
-        force_external: parsed_options[:force_external]
+        force_external: parsed_options[:force_external],
+        amend: amend?
       )
 
       commit_message = generator.generate(style_guide, parsed_options[:context])
