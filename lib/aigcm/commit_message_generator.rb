@@ -1,8 +1,7 @@
-
 require "net/http"
 require "json"
 require "open3"
-require "ai_client"
+require "ruby_llm"
 
 module Aigcm
   class CommitMessageGenerator
@@ -10,17 +9,23 @@ module Aigcm
 
     MAX_DIFF_SIZE = 4000 # Characters
 
-    def initialize(model:, provider:, max_tokens:, force_external:)
+    def initialize(model:, provider:, max_tokens:, force_external: false, amend: false)
+      @model = model
+      @provider = provider
+      @max_tokens = max_tokens
       @force_external = force_external
-      validate_model_provider_combination(model)
+      @amend = amend
+      infer_provider_from_model
       check_provider_availability
 
-      @client = AiClient.new(model, provider: provider)
+      configure_ruby_llm
+      @chat = RubyLLM.chat(model: @model)
     rescue StandardError => e
       raise Error, "Failed to initialize AI client: #{e.message}"
     end
 
-    def generate(diff, style_guide, context = [])
+    def generate(style_guide, context = [])
+      diff = GitDiff.new(dir: Dir.pwd, amend: @amend).generate_diff
       return "No changes to commit" if diff.strip.empty?
 
       check_repository_privacy unless @force_external
@@ -34,8 +39,8 @@ module Aigcm
       prompt = build_prompt(diff, style_guide, processed_context)
 
       begin
-        response = @client.chat(prompt)
-        response.to_s.strip
+        response = @chat.ask(prompt)
+        response.content.strip
       rescue StandardError => e
         "Error generating commit message: #{e.message}"
       end
@@ -43,11 +48,40 @@ module Aigcm
 
     private
 
-    def validate_model_provider_combination(model)
-      client = AiClient.new(model)
-      @provider = client.provider
-    rescue ArgumentError => e
-      raise Error, "Invalid model/provider combination: #{e.message}"
+    def infer_provider_from_model
+      return if @provider
+
+      model_lower = @model.to_s.downcase
+      @provider = if model_lower.include?('gpt') || model_lower.include?('o1') || model_lower.include?('o3')
+                    :openai
+                  elsif model_lower.include?('claude')
+                    :anthropic
+                  elsif model_lower.include?('gemini')
+                    :google
+                  elsif model_lower.include?('mistral') || model_lower.include?('mixtral')
+                    :mistral
+                  elsif model_lower.include?('llama') || model_lower.include?('qwen') || model_lower.include?('deepseek')
+                    :ollama
+                  else
+                    :openai
+                  end
+    end
+
+    def configure_ruby_llm
+      RubyLLM.configure do |config|
+        case @provider
+        when :ollama
+          config.ollama_api_base = 'http://localhost:11434/v1'
+        when :openai
+          config.openai_api_key = ENV.fetch('OPENAI_API_KEY', nil)
+        when :anthropic
+          config.anthropic_api_key = ENV.fetch('ANTHROPIC_API_KEY', nil)
+        when :google
+          config.gemini_api_key = ENV.fetch('GEMINI_API_KEY', nil)
+        when :mistral
+          config.mistral_api_key = ENV.fetch('MISTRAL_API_KEY', nil)
+        end
+      end
     end
 
     def check_provider_availability

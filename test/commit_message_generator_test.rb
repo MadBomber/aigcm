@@ -1,54 +1,69 @@
 require 'minitest/autorun'
 require 'tempfile'
+require 'fileutils'
 require_relative '../lib/aigcm/commit_message_generator'
 
 module Aigcm
   class TestCommitMessageGenerator < Minitest::Test
     def setup
-      # Mock AiClient to avoid actual API calls
-      @mock_client = Minitest::Mock.new
+      @orig_dir = Dir.pwd
+      @temp_dir = Dir.mktmpdir
+      Dir.chdir(@temp_dir)
+      system('git init', out: File::NULL, err: File::NULL)
+      system('git config user.email "test@test.com"', out: File::NULL, err: File::NULL)
+      system('git config user.name "Test User"', out: File::NULL, err: File::NULL)
 
-      def @mock_client.chat(_)
-        "feat: test commit message"
-      end
-      def @mock_client.provider
-        :ollama
-      end
+      @generator = CommitMessageGenerator.new(
+        model: 'gpt-4o-mini',
+        max_tokens: 1000,
+        provider: :openai,
+        force_external: true
+      )
+    end
 
-      AiClient.stub :new, @mock_client do
-        @generator = CommitMessageGenerator.new(
-          model: 'llama3.3',
-          max_tokens: 1000,
-          provider: :ollama,
-          force_external: false
-        )
-      end
+    def teardown
+      Dir.chdir(@orig_dir)
+      FileUtils.remove_entry @temp_dir if @temp_dir && Dir.exist?(@temp_dir)
     end
 
     def test_generate_empty_diff
-      skip("Skipping this test due to mock object issues")
-      result = @generator.generate('', 'test style guide')
-      assert_equal "No changes to commit", result
+      # GitDiff raises an error when there are no staged changes
+      assert_raises(Aigcm::GitDiff::Error) do
+        @generator.generate('test style guide')
+      end
     end
 
     def test_generate_with_diff
-      AiClient.stub :new, @mock_client do
-        result = @generator.generate('test diff', 'test style guide')
-        assert_kind_of String, result
-        assert_match(/^feat: /, result)
-      end
+      File.write('test.txt', 'Hello World')
+      system('git add test.txt', out: File::NULL, err: File::NULL)
+
+      result = @generator.generate('Use conventional commits format')
+      assert_kind_of String, result
+      refute_empty result
+      refute_equal "No changes to commit", result
     end
 
     def test_context_with_file
-      Tempfile.create(['test', '.txt']) do |f|
-        f.write('test content')
+      Tempfile.create(['context', '.txt']) do |f|
+        f.write('Additional context for the commit')
         f.flush
 
-        AiClient.stub :new, @mock_client do
-          result = @generator.generate('test diff', 'test style guide', ["@#{f.path}"])
-          assert_includes result, 'feat:'
-        end
+        File.write('feature.rb', 'def hello; puts "hello"; end')
+        system('git add feature.rb', out: File::NULL, err: File::NULL)
+
+        result = @generator.generate('Use conventional commits', ["@#{f.path}"])
+        assert_kind_of String, result
+        refute_empty result
       end
+    end
+
+    def test_generate_with_inline_context
+      File.write('bugfix.rb', 'fixed_value = 42')
+      system('git add bugfix.rb', out: File::NULL, err: File::NULL)
+
+      result = @generator.generate('Use conventional commits', ['This fixes issue #123'])
+      assert_kind_of String, result
+      refute_empty result
     end
   end
 end

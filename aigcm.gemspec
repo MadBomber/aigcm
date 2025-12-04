@@ -45,11 +45,12 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Runtime dependencies
-  spec.add_dependency "ai_client", "~> 0.4.0"
+  spec.add_dependency "ruby_llm"
 
   # Development dependencies
   spec.add_development_dependency "minitest", "~> 5.16"
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rubocop", "~> 1.21"
+  spec.add_development_dependency "debug_me"
 end

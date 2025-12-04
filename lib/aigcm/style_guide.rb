@@ -42,7 +42,7 @@ __END__
 • Use Imperative Mood: Phrase commands as direct actions (e.g., "Add feature" instead of "Added feature").
 
 2. Provide a Detailed Body:
-• Seperate the body from the subject line with a blank line.
+• Separate the body from the subject line with a blank line.
 • Explain the Reason: Clearly articulate the rationale for the change rather than just summarizing the modification.
 • Wrap Body Text at <%= Aigcm::StyleGuide::LINE_MAX %> Characters: Ensure that the body text wraps at <%= Aigcm::StyleGuide::LINE_MAX %> characters per line.
 
