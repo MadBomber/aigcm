@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.homepage     = "https://github.com/MadBomber/aigcm"
   spec.license      = "MIT"
 
-  spec.required_ruby_version = ">= 3.1.0"
+  spec.required_ruby_version = ">= 4.0"
 
   # Specify the gem server as rubygems.org
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
